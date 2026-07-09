@@ -1,0 +1,54 @@
+%% C4 Nível 3 — Diagrama de Componentes (interior do monólito) · D.S Tolini
+%% Versão final aprovada. Arquitetura hexagonal (ports & adapters):
+%%   - Web (controller fino) -> Service (orquestrador) -> Repository + Engine
+%%   - Toda fronteira de I/O passa por uma porta: MarketDataSource (externo) e InvestmentRepository (banco)
+%%   - PricingEngine é núcleo puro: nenhuma seta de saída
+%%   - BACEN desenhado como FUTURO V2 (tracejado/apagado), ver ADR-003
+graph TD
+    subgraph DSTolini_API [Contêiner: API Core - Monólito Java Spring Boot]
+        Web[Web Controller <br> Traduz HTTP / JSON]
+        Job[Scheduled Task <br> @Scheduled Job]
+        Service[PricingService <br> Orquestrador da Lógica]
+        MDS[MarketDataSource <br> Interface de Ingestão]
+        Repo[InvestmentRepository <br> Interface de Dados]
+        Engine[PricingEngine <br> Núcleo Matemático Puro]
+
+        %% Fluxo síncrono do usuário (caminho fino)
+        Web -->|1. Passa dados do request| Service
+        Service -->|2. Pede cotação histórica| Repo
+        Service -->|3. Injeta dados para cálculo| Engine
+
+        %% Fluxo de ingestão do Job (não toca Engine nem Web)
+        Job -->|4. Aciona busca de taxas| MDS
+        Job -->|5. Manda persistir dados coletados| Repo
+    end
+
+    %% Banco isolado atrás do Repository
+    DB[(Banco de Dados <br> Postgres)]
+    Repo -->|6. Acesso a dados via JDBC / Porta 5432| DB
+
+    %% Externos
+    Usuario[Investidor Brasileiro <br> via Postman/curl]
+    subgraph Fontes_Externas [Provedores de Dados de Mercado]
+        Treasury[Treasury API <br> Juros EUA - V1]
+        BACEN[API Banco Central <br> Selic & PTAX - FUTURO V2]
+    end
+
+    %% Fronteiras de rede críticas
+    Usuario -->|Chamada HTTP Síncrona| Web
+    MDS -->|HTTPS em Background <br> Resiliência: Timeout / Retry| Treasury
+    MDS -.->|HTTPS em Background <br> Planejado para V2| BACEN
+
+    %% Estilização
+    style DSTolini_API fill:#111b24,color:#fff,stroke:#fff,stroke-width:2px
+    style Web fill:#1c2d42,color:#fff,stroke:#fff
+    style Job fill:#1b4d3e,color:#fff,stroke:#fff
+    style Service fill:#34495e,color:#fff,stroke:#fff
+    style Engine fill:#8b0000,color:#fff,stroke:#fff
+    style MDS fill:#6a4a3a,color:#fff,stroke:#fff
+    style Repo fill:#5c3a21,color:#fff,stroke:#fff
+    style DB fill:#3F4F5F,color:#fff
+    style Usuario fill:#0073BB,color:#fff,stroke:#111
+    style Fontes_Externas fill:#f2f2f2,stroke:#333,stroke-dasharray: 5 5
+    style Treasury fill:#79b5ac,color:#fff,stroke:#111
+    style BACEN fill:#abaaaa,color:#fff,stroke:#111,stroke-dasharray: 5 5

@@ -1,0 +1,48 @@
+%% Diagrama de Sequência — Fluxo de Cálculo de YTM · D.S Tolini
+%% Versão final aprovada. Modela o caminho de erro ANTES do caminho feliz.
+%% Camadas de validação como portas sucessivas:
+%%   B1: fail-fast na borda (input inválido / preço negativo) -> HTTP 400
+%%   A : dados defasados ou inexistentes                       -> HTTP 422
+%%   B2: solver não converge (raiz fora do bracket)            -> HTTP 422 (SolverConvergenceException)
+%%   C : caminho feliz                                          -> HTTP 200
+sequenceDiagram
+    autonumber
+    actor Usuario as Investidor (Postman/curl)
+    participant Web as WebController
+    participant Service as PricingService
+    participant Repo as InvestmentRepository
+    participant Engine as PricingEngine
+
+    Note over Usuario, Engine: Fluxo de Cálculo de YTM (Yield to Maturity)
+    Usuario->>Web: POST /v1/pricing/ytm (Payload)
+
+    %% B1: Fail Fast na borda
+    Note over Web, Service: [FAIL FAST] Validação de Formato / Preço Negativo
+    alt Preço Negativo ou Input Inválido
+        Web-->>Usuario: HTTP 400 Bad Request (Lixo na Entrada)
+    else Entrada Inicialmente Válida
+        Web->>Service: calcularYtm(payload)
+        Service->>Repo: buscarCotacaoHistorica(id)
+        Repo-->>Service: Retorna Objeto Cotacao (Taxas/Timestamp)
+
+        %% A: dados defasados
+        alt Dados locais com mais de 3 dias ou Nulos
+            Service-->>Web: Lança MarketDataUnavailableException
+            Web-->>Usuario: HTTP 422 Unprocessable Entity (Dados Velhos)
+
+        %% B2: limite do algoritmo
+        else Dados OK -> Invocação do Motor Matemático
+            Service->>Engine: calcularYtm(cotacao, preco)
+            alt Solver Não Converge (Raiz fora do bracket)
+                Engine-->>Service: Lança SolverConvergenceException
+                Service-->>Web: Repassa Erro de Algoritmo
+                Web-->>Usuario: HTTP 422 Unprocessable Entity (Cálculo Inviável)
+
+            %% C: caminho feliz
+            else Matemática Converge com Sucesso
+                Engine-->>Service: Retorna Taxa Calculada (Double)
+                Service-->>Web: Retorna DTO de Resposta Pronto
+                Web-->>Usuario: HTTP 200 OK + JSON (Resultado)
+            end
+        end
+    end

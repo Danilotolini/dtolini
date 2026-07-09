@@ -1,0 +1,43 @@
+%% C4 Nível 2 — Diagrama de Contêiner · D.S Tolini
+%% Visão das peças que rodam/se deployam: SPA, API monólito, Postgres + sistemas externos.
+%% NOTA: este L2 mostra o interior do monólito (Web/Job/Engine), o que é um híbrido com o L3.
+%% No L2 puro o monólito é uma caixa só; o detalhamento interno vive no L3 (ver c4-l3-componentes.mermaid).
+graph TD
+    subgraph DSTolini_Enterprise [Sistema D.S Tolini]
+
+        SPA[Front-end SPA <br> React / TypeScript]
+
+        subgraph Monolith [API Core - Monólito Java]
+            Web[Endpoints / REST Controller]
+            Job[Scheduled Task / @Scheduled]
+            Engine[PricingEngine - Núcleo Puro]
+
+            Web -->|Invoca cálculos| Engine
+        end
+
+        DB[(Banco de Dados <br> Postgres)]
+
+        %% Conexões Internas (Baixo risco de rede)
+        SPA -->|1. Envia JSON / Recebe Resposta HTTP| Web
+        Web -->|2. Executa SQL / Retorna Dados| DB
+        Job -->|3. Salva Cotações / SQL| DB
+    end
+
+    %% Elementos Externos (Fronteiras de Alto Risco)
+    Usuario[Investidor / Usuário Final]
+    Treasury[Treasury Fiscal Data API]
+
+    %% Fluxos Cruzando Fronteiras Síncronas
+    Usuario -->|Acessa App / Recebe Interface| SPA
+    Job -->|4. Pede Cotação / Recebe JSON das Taxas| Treasury
+
+    %% Estilização
+    style DSTolini_Enterprise fill:#f5f5f5,stroke:#333,stroke-width:2px
+    style Monolith fill:#111b24,color:#fff,stroke:#fff,stroke-width:2px
+    style SPA fill:#232F3E,color:#fff,stroke:#111
+    style Web fill:#1c2d42,color:#fff,stroke:#fff
+    style Job fill:#1b4d3e,color:#fff,stroke:#fff
+    style Engine fill:#8b0000,color:#fff,stroke:#fff
+    style DB fill:#3F4F5F,color:#fff,stroke:#111
+    style Usuario fill:#0073BB,color:#fff,stroke:#111
+    style Treasury fill:#79b5ac,color:#fff,stroke:#111

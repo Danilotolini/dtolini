@@ -1,0 +1,19 @@
+# Build
+target/
+*.class
+
+# IDE — IntelliJ
+.idea/
+*.iml
+
+# IDE — VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Maven wrapper (não usamos ainda, mas prevenir)
+.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
