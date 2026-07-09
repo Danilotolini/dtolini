@@ -1,0 +1,46 @@
+name: Feature Request
+description: Nova funcionalidade ou melhoria no motor de cálculo ou na API.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Antes de abrir, verifique se o escopo está alinhado com os ADRs em `docs/adr/`.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qual problema isso resolve?
+      description: Descreva a necessidade do ponto de vista do investidor ou do sistema.
+      placeholder: "Como investidor, quero calcular... porque hoje preciso..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solução proposta
+      description: Como você imagina a implementação?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Escopo
+      options:
+        - "PricingEngine (cálculo puro)"
+        - "API REST (adaptador de entrada)"
+        - "Ingestão / MarketDataSource (adaptador de saída)"
+        - "Persistência / InvestmentRepository"
+        - "Infra / CI / DevOps"
+        - "Documentação"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+      description: Outras abordagens e por que não as escolheu.

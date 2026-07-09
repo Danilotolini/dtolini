@@ -1,0 +1,41 @@
+name: Bug Report
+description: Algo está calculando errado ou quebrando.
+title: "bug: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar. Preencha os campos abaixo para que o bug seja reproduzido rapidamente.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: O que aconteceu?
+      description: Descreva o comportamento incorreto.
+      placeholder: "Ao calcular o YTM com preço X e vencimento Y, o resultado foi Z em vez de W."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Como reproduzir
+      description: Passo a passo ou curl/Postman request mínimo.
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+      description: O que deveria ter acontecido?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexto adicional
+      description: Versão do Java, SO, trecho de log relevante.
