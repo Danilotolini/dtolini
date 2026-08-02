@@ -17,8 +17,8 @@ public record RatesResponseDto(
 
     public static RatesResponseDto stale(List<TreasuryRate> rates, LocalDate dataDate) {
         String msg = dataDate != null
-                ? String.format("Dados de %s. Atualização do dia ainda não disponível — exibindo último cache válido.", dataDate)
-                : "Nenhum dado disponível. Aguardando primeira ingestão.";
+                ? String.format("As informações exibidas são de %s. Os dados de hoje estão sendo obtidos e estarão disponíveis em breve.", dataDate)
+                : "As informações ainda não estão disponíveis. Por favor, tente novamente em alguns minutos.";
         return new RatesResponseDto(rates, dataDate, true, msg);
     }
 }
