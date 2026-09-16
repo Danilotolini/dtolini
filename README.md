@@ -1,6 +1,6 @@
 <div align="center">
 
-# D.Tolini
+# DTolini
 
 **Transforma taxas cruas de Treasuries americanas em respostas acionáveis.**
 
@@ -21,7 +21,7 @@ O investidor brasileiro que compra Treasuries americanas não tem uma ferramenta
 - *Quanto de juro acumulado vou pagar comprando entre cupons?*
 - *Qual a escada de vencimentos que otimiza meu fluxo de caixa?*
 
-D.Tolini responde essas perguntas via API, consumindo dados reais da Treasury Fiscal Data API e executando os cálculos de forma precisa e auditável.
+DTolini responde essas perguntas via API, consumindo dados reais da Treasury Fiscal Data API e executando os cálculos de forma precisa e auditável.
 
 ---
 
@@ -103,8 +103,8 @@ A dependência da Treasury API fica fora do caminho crítico do usuário. Um pro
 
 ```bash
 # clonar
-git clone https://github.com/Danilotolini/d-tolini.git
-cd d-tolini
+git clone https://github.com/Danilotolini/dtolini.git
+cd dtolini
 
 # rodar os testes (Java 21 + Maven necessários)
 mvn test
