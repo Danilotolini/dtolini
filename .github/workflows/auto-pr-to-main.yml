@@ -1,0 +1,64 @@
+name: Abrir PR develop → main
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-pr:
+    name: Criar PR para main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Criar PR develop → main se não existir
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          existing=$(gh pr list \
+            --base main \
+            --head develop \
+            --state open \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [ -n "$existing" ]; then
+            echo "PR #$existing já existe entre develop e main. Nenhuma ação necessária."
+            exit 0
+          fi
+
+          last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "início do projeto")
+          commits=$(git log origin/main..HEAD --oneline --no-merges | head -20)
+
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "release: integração de develop em main" \
+            --body "$(cat <<EOF
+## O que esse PR integra?
+
+Mudanças acumuladas em \`develop\` desde a última versão em \`main\` (\`$last_tag\`).
+
+## Commits incluídos
+
+\`\`\`
+$commits
+\`\`\`
+
+## Checklist antes de mergear em main
+
+- [ ] CI verde em develop
+- [ ] Funcionalidades testadas manualmente
+- [ ] Versão atualizada no \`pom.xml\` se for release
+
+---
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+EOF
+)"
