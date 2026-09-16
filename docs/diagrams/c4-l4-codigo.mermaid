@@ -1,0 +1,61 @@
+classDiagram
+    title D.Tolini — Código do Domínio (C4)
+
+    class Bond {
+        +String cusip
+        +BigDecimal couponRate
+        +LocalDate maturityDate
+        +LocalDate issueDate
+        +BigDecimal faceValue
+        +int paymentFrequency
+        +treasury()$ Bond
+    }
+
+    class PricingResult {
+        +BigDecimal yieldToMaturity
+        +BigDecimal cleanPrice
+        +BigDecimal dirtyPrice
+        +BigDecimal accruedInterest
+        +LocalDate settlementDate
+    }
+
+    class PricingEngine {
+        +yieldToMaturity(Bond, BigDecimal, LocalDate) BigDecimal
+        +dirtyPrice(Bond, BigDecimal, LocalDate) BigDecimal
+        +accruedInterest(Bond, LocalDate) BigDecimal
+    }
+
+    class BondPricingUseCase {
+        <<interface>>
+        +calculateYtm(Bond, BigDecimal, LocalDate) PricingResult
+        +calculatePrice(Bond, BigDecimal, LocalDate) PricingResult
+    }
+
+    class BondPricingService {
+        +calculateYtm(Bond, BigDecimal, LocalDate) PricingResult
+        +calculatePrice(Bond, BigDecimal, LocalDate) PricingResult
+    }
+
+    class BondPricingController {
+        +calculateYtm(YtmRequestDto) PricingResponseDto
+        +calculatePrice(PriceRequestDto) PricingResponseDto
+    }
+
+    class TreasuryRateRepository {
+        <<interface>>
+        +saveAll(List~TreasuryRate~)
+        +findLatest() List~TreasuryRate~
+        +findByCusip(String) Optional~TreasuryRate~
+    }
+
+    class MarketDataSource {
+        <<interface>>
+        +fetchLatestRates() List~TreasuryRate~
+    }
+
+    BondPricingService ..|> BondPricingUseCase : implements
+    BondPricingController --> BondPricingUseCase : uses
+    BondPricingService --> PricingEngine : delegates calculation
+    BondPricingService --> TreasuryRateRepository : reads rates
+    PricingEngine ..> Bond : receives
+    PricingEngine ..> PricingResult : produces
