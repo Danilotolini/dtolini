@@ -12,11 +12,11 @@
     </parent>
 
     <groupId>com.dstolini</groupId>
-    <artifactId>ds-tolini</artifactId>
+    <artifactId>d-tolini</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>ds-tolini</name>
+    <name>d-tolini</name>
     <description>API de renda fixa americana — YTM, juro acumulado, preço e bond ladder para Treasuries</description>
 
     <properties>

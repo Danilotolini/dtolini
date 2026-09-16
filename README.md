@@ -1,6 +1,6 @@
 <div align="center">
 
-# D.S Tolini
+# D.Tolini
 
 **Transforma taxas cruas de Treasuries americanas em respostas acionáveis.**
 
@@ -21,7 +21,7 @@ O investidor brasileiro que compra Treasuries americanas não tem uma ferramenta
 - *Quanto de juro acumulado vou pagar comprando entre cupons?*
 - *Qual a escada de vencimentos que otimiza meu fluxo de caixa?*
 
-D.S Tolini responde essas perguntas via API, consumindo dados reais da Treasury Fiscal Data API e executando os cálculos de forma precisa e auditável.
+D.Tolini responde essas perguntas via API, consumindo dados reais da Treasury Fiscal Data API e executando os cálculos de forma precisa e auditável.
 
 ---
 
@@ -31,11 +31,11 @@ D.S Tolini responde essas perguntas via API, consumindo dados reais da Treasury 
 
 | Funcionalidade | Descrição |
 |---|---|
-| **Yield to Maturity** | Solver numérico por bisseção — convergência garantida por teorema |
+| **Yield to Maturity** | Solver numérico por bisseção, convergência garantida por teorema |
 | **Accrued Interest** | Juro acumulado entre datas de cupom com day-count convention |
 | **Preço sujo / limpo** | Precificação a partir do yield ou do preço de mercado |
 | **Bond Ladder** | Escada de vencimentos a partir de um portfólio de títulos |
-| **Ingestão assíncrona** | Cache diário de taxas via Treasury Fiscal Data API |
+| **Atualização diária** | Taxas obtidas automaticamente da Treasury Fiscal Data API |
 
 ### O que **não** está na V1
 
@@ -69,7 +69,7 @@ Monólito Java + Spring Boot em estilo **hexagonal (ports & adapters)**.
 └─────────────────────────────────────────────┘
 ```
 
-A dependência da Treasury API fica **fora do caminho crítico do usuário**: um `@Scheduled` Job faz a ingestão periódica e popula o cache local. O fluxo de requisição lê apenas dados já saneados — detalhado no [ADR-001](docs/adr/adr-001-ingestao-assincrona.md).
+A dependência da Treasury API fica fora do caminho crítico do usuário. Um processo agendado obtém as taxas diariamente e as armazena localmente. O fluxo de requisição lê apenas dados já processados, detalhado no [ADR-001](docs/adr/adr-001-ingestao-assincrona.md).
 
 ---
 
@@ -79,18 +79,20 @@ A dependência da Treasury API fica **fora do caminho crítico do usuário**: um
 
 | ADR | Título | Decisão resumida |
 |-----|--------|-----------------|
-| [ADR-001](docs/adr/adr-001-ingestao-assincrona.md) | Ingestão Assíncrona e Cache | `@Scheduled` Job isola a Treasury API do request path |
+| [ADR-001](docs/adr/adr-001-ingestao-assincrona.md) | Ingestão Assíncrona | Processo agendado isola a Treasury API do caminho do usuário |
 | [ADR-002](docs/adr/adr-002-postgresql.md) | PostgreSQL como persistência | Modelo relacional para dados financeiros com séries temporais |
 | [ADR-003](docs/adr/adr-003-bacen-v2.md) | Integração BACEN adiada para V2 | V1 foca no motor de cálculo; BACEN/PTAX entram depois |
-| [ADR-004](docs/adr/adr-004-bisseccao.md) | Bisseção como solver de YTM | Convergência garantida vs. Newton-Raphson (sem derivada, sem divergência) |
+| [ADR-004](docs/adr/adr-004-bisseccao.md) | Bisseção como solver de YTM | Convergência garantida vs. Newton-Raphson |
 
-### Diagramas
+### Diagramas C4
 
-| Diagrama | Descrição |
-|----------|-----------|
-| [c4-l2-conteiner.mermaid](docs/diagrams/c4-l2-conteiner.mermaid) | Visão de contêineres — C4 nível 2 |
-| [c4-l3-componentes.mermaid](docs/diagrams/c4-l3-componentes.mermaid) | Componentes internos — C4 nível 3 |
-| [sequencia-ytm.mermaid](docs/diagrams/sequencia-ytm.mermaid) | Sequência completa do fluxo de cálculo YTM |
+| Diagrama | Nível | Descrição |
+|----------|-------|-----------|
+| [c4-l1-contexto.mermaid](docs/diagrams/c4-l1-contexto.mermaid) | C1 | O sistema no mundo: usuário e dependências externas |
+| [c4-l2-conteiner.mermaid](docs/diagrams/c4-l2-conteiner.mermaid) | C2 | Contêineres: aplicação, banco de dados |
+| [c4-l3-componentes.mermaid](docs/diagrams/c4-l3-componentes.mermaid) | C3 | Componentes internos da aplicação |
+| [c4-l4-codigo.mermaid](docs/diagrams/c4-l4-codigo.mermaid) | C4 | Classes e interfaces do domínio |
+| [sequencia-ytm.mermaid](docs/diagrams/sequencia-ytm.mermaid) | Sequência | Fluxo completo do cálculo de YTM |
 
 > Os arquivos `.mermaid` são renderizados automaticamente pelo GitHub e também podem ser
 > visualizados em [mermaid.live](https://mermaid.live).
@@ -101,15 +103,14 @@ A dependência da Treasury API fica **fora do caminho crítico do usuário**: um
 
 ```bash
 # clonar
-git clone https://github.com/Danilotolini/ds-tolini.git
-cd ds-tolini
+git clone https://github.com/Danilotolini/d-tolini.git
+cd d-tolini
 
 # rodar os testes (Java 21 + Maven necessários)
 mvn test
 ```
 
-> Spring Boot, PostgreSQL e Docker entram em uma iteração futura.
-> Por enquanto o projeto é Java puro — núcleo de cálculo sem dependências externas.
+> Para subir a aplicação completa é necessário Docker. Consulte o `docker-compose.yml` na raiz do projeto.
 
 ---
 
@@ -117,4 +118,4 @@ mvn test
 
 **Semana 1 — núcleo de cálculo.**
 
-O repositório está bootstrapado com a documentação de design completa (4 ADRs + 3 diagramas C4/sequência). O próximo passo é implementar o `PricingEngine` em Java puro: day-count conventions, accrued interest e o solver de YTM por bisseção — sem framework, sem I/O.
+O repositório está estruturado com a documentação de design completa (4 ADRs + 5 diagramas). O próximo passo é implementar o `PricingEngine` em Java puro: day-count conventions, accrued interest e o solver de YTM por bisseção.
