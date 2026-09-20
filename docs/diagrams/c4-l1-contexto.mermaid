@@ -1,11 +1,11 @@
 C4Context
     title DTolini - Contexto do Sistema (C1)
 
-    Person(investidor, "Investidor Brasileiro", "Quer saber o rendimento real de Treasuries e comparar com opções de renda fixa locais")
+    Person(investidor, "Investidor Brasileiro", "Quer saber o rendimento real de Treasuries e comparar com opcoes de renda fixa locais")
 
-    System(dtolini, "D.Tolini", "Calcula YTM, preço limpo, preço sujo, juro acumulado e escada de títulos para Treasuries americanas em dólar")
+    System(dtolini, "DTolini", "Calcula YTM, preco limpo, preco sujo, juro acumulado e escada de titulos para Treasuries americanas em dolar")
 
-    System_Ext(treasury, "Treasury Fiscal Data API", "Publica diariamente as taxas oficiais de títulos do governo americano (H.15)")
+    System_Ext(treasury, "Treasury Fiscal Data API", "Publica diariamente as taxas oficiais de titulos do governo americano (H.15)")
 
-    Rel(investidor, dtolini, "Consulta rendimentos e preços", "REST / JSON")
-    Rel(dtolini, treasury, "Obtém taxas diárias automaticamente", "HTTPS")
+    Rel(investidor, dtolini, "Consulta rendimentos e precos", "REST / JSON")
+    Rel(dtolini, treasury, "Obtem taxas diarias automaticamente", "HTTPS")
