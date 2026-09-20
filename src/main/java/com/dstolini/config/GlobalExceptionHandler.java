@@ -41,6 +41,14 @@ class GlobalExceptionHandler {
                 .body(ErrorResponseDto.of("VALIDATION_ERROR", details));
     }
 
+    @ExceptionHandler(UnsupportedOperationException.class)
+    ResponseEntity<ErrorResponseDto> handleNotImplemented(UnsupportedOperationException e) {
+        log.warn("Funcionalidade ainda nao implementada: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+                .body(ErrorResponseDto.of("NOT_IMPLEMENTED",
+                        "Esta funcionalidade ainda nao esta disponivel."));
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<ErrorResponseDto> handleUnexpected(Exception e) {
         log.error("Erro inesperado", e);
