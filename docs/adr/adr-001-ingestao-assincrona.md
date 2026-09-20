@@ -3,7 +3,7 @@
 **Status:** Aceito
 
 ## Contexto
-A API da D.S Tolini depende de dados de taxas de juros fornecidos pela Treasury Fiscal Data API (EUA) para executar o cálculo do Yield to Maturity (YTM). Chamadas de rede síncronas realizadas diretamente no fluxo de requisição do usuário final (request path) introduzem latência internacional imprevisível e expõem a plataforma a falhas em cascata, indisponibilidade ou timeouts caso o serviço do governo americano apresente instabilidade.
+A API da DTolini depende de dados de taxas de juros fornecidos pela Treasury Fiscal Data API (EUA) para executar o cálculo do Yield to Maturity (YTM). Chamadas de rede síncronas realizadas diretamente no fluxo de requisição do usuário final (request path) introduzem latência internacional imprevisível e expõem a plataforma a falhas em cascata, indisponibilidade ou timeouts caso o serviço do governo americano apresente instabilidade.
 
 ## Decisão
 Isolar completamente a dependência externa do caminho crítico do usuário. A comunicação com a Treasury API será realizada exclusivamente por um processo em segundo plano (`@Scheduled` Job) executado de forma agendada. Este componente efetuará a ingestão dos dados diários e os persistirá em uma camada de banco de dados local. O fluxo de leitura do usuário consumirá estritamente os dados já saneados e armazenados localmente.

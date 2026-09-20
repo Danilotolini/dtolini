@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.dstolini</groupId>
+    <groupId>com.dtolini</groupId>
     <artifactId>dtolini</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
