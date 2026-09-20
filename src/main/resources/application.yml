@@ -46,6 +46,12 @@ treasury:
   ingest:
     cron: "0 30 21 * * MON-FRI"   # 18h30 BRT (UTC-3)
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+  api-docs:
+    path: /api-docs
+
 logging:
   level:
     com.dstolini: DEBUG
