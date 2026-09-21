@@ -1,4 +1,4 @@
-# Contribuindo com D.S Tolini
+# Contribuindo com DTolini
 
 ## Modelo de branches — GitFlow
 

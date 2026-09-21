@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ds-tolini
+    name: dtolini
 
   datasource:
     url: jdbc:postgresql://localhost:5432/dstolini
@@ -54,6 +54,6 @@ springdoc:
 
 logging:
   level:
-    com.dstolini: DEBUG
+    com.dtolini: DEBUG
     org.springframework.web: INFO
     org.hibernate.SQL: WARN
